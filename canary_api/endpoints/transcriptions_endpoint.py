@@ -51,7 +51,6 @@ async def process_asr_request(
     beam_size: int,
     batch_size: int,
     response_format: str = 'json',
-    word_boosting: list = None,
 ):
     # Check if language is supported
     if language not in SUPPORTED_LANGUAGES:
@@ -118,8 +117,7 @@ async def process_asr_request(
                     pnc=pnc,
                     timestamps=timestamps_flag,
                     source_lang=language,
-                    target_lang=language,
-                    word_boosting=word_boosting
+                    target_lang=language
                 )
 
                 # Measure chunk's duration
@@ -156,8 +154,7 @@ async def process_asr_request(
                 pnc=pnc,
                 timestamps=timestamps_flag,
                 source_lang=language,
-                target_lang=language,
-                word_boosting=word_boosting
+                target_lang=language
             )
             all_results.extend(results)
             texts.append(results[0].text)
@@ -209,15 +206,6 @@ async def asr_endpoint(request: Request):
         beam_size = int(form_data.get('beam_size', 1))
         batch_size = int(form_data.get('batch_size', 1))
         response_format = form_data.get('response_format', 'json')
-        
-        word_boosting_str = form_data.get('word_boosting', None)
-        word_boosting = None
-        if word_boosting_str:
-            try:
-                import json
-                word_boosting = json.loads(word_boosting_str)
-            except:
-                logger.warning(f"Invalid word_boosting format: {word_boosting_str}")
 
         result = await process_asr_request(
             audio_bytes,
@@ -226,8 +214,7 @@ async def asr_endpoint(request: Request):
             timestamps,
             beam_size,
             batch_size,
-            response_format,
-            word_boosting
+            response_format
         )
 
         # Detect if result is plain text
@@ -260,15 +247,6 @@ async def openai_transcriptions_endpoint(request: Request):
         language = form_data.get('language', 'en')
         response_format = form_data.get('response_format', 'json')
         
-        word_boosting_str = form_data.get('word_boosting', None)
-        word_boosting = None
-        if word_boosting_str:
-            try:
-                import json
-                word_boosting = json.loads(word_boosting_str)
-            except:
-                logger.warning(f"Invalid word_boosting format: {word_boosting_str}")
-        
         result = await process_asr_request(
             audio_bytes,
             language,
@@ -276,8 +254,7 @@ async def openai_transcriptions_endpoint(request: Request):
             timestamps='no',
             beam_size=1,
             batch_size=1,
-            response_format=response_format,
-            word_boosting=word_boosting
+            response_format=response_format
         )
 
         if isinstance(result, str):

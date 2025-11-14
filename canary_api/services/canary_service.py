@@ -54,7 +54,6 @@ class CanaryService:
         timestamps: bool | None = False,
         source_lang: str = 'en',
         target_lang: str = 'en',
-        word_boosting: list = None,
     ):
         """
         Transcribes or translates the given audio input.
@@ -74,26 +73,17 @@ class CanaryService:
             "target_lang": target_lang,
             "batch_size":  batch_size,
             "pnc":         pnc,
-            "timestamps":  timestamps,
-            "word_boosting": word_boosting
+            "timestamps":  timestamps
         })
 
-        transcribe_kwargs = {
-            "audio": audio_input,
-            "source_lang": source_lang,
-            "target_lang": target_lang,
-            "batch_size": batch_size,
-            "pnc": pnc,
-            "timestamps": timestamps
-        }
-        
-        # Word boosting is not directly supported by model.transcribe()
-        # It requires custom decoder configuration which is not yet implemented
-        # Keeping parameter for future compatibility
-        if word_boosting:
-            logger.warning("Word boosting parameter received but not yet implemented for Canary model")
-        
-        return self.model.transcribe(**transcribe_kwargs)
+        return self.model.transcribe(
+            audio=audio_input,
+            source_lang=source_lang,
+            target_lang=target_lang,
+            batch_size=batch_size,
+            pnc=pnc,
+            timestamps=timestamps
+        )
 
 
 if __name__ == "__main__":
