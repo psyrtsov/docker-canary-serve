@@ -54,6 +54,7 @@ class CanaryService:
         timestamps: bool | None = False,
         source_lang: str = 'en',
         target_lang: str = 'en',
+        word_boosting: list = None,
     ):
         """
         Transcribes or translates the given audio input.
@@ -73,7 +74,8 @@ class CanaryService:
             "target_lang": target_lang,
             "batch_size":  batch_size,
             "pnc":         pnc,
-            "timestamps":  timestamps
+            "timestamps":  timestamps,
+            "word_boosting": word_boosting
         })
 
         return self.model.transcribe(
@@ -82,7 +84,8 @@ class CanaryService:
             target_lang=target_lang,
             batch_size=batch_size,
             pnc=pnc,
-            timestamps=timestamps
+            timestamps=timestamps,
+            word_boosting=word_boosting
         )
 
 
