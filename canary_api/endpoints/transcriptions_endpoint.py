@@ -81,10 +81,14 @@ async def process_asr_request(
     audio_path = save_temp_audio(audio_bytes)
 
     try:
-        transcriber_with_config = CanaryService(beam_size=beam_size)
+        # Reuse global transcriber and update beam size if needed
+        if beam_size != settings.beam_size:
+            decode_cfg = transcriber.model.cfg.decoding
+            decode_cfg.beam.beam_size = beam_size
+            transcriber.model.change_decoding_strategy(decode_cfg)
 
         # Check if timestamps are requested and if the model supports it
-        if timestamps_flag and not transcriber_with_config.is_flash_model:
+        if timestamps_flag and not transcriber.is_flash_model:
             logger.error("Timestamps requested but model is not flash variant")
             raise HTTPException(400, "Timestamps are only supported with flash models (e.g., canary-1b-flash)")
 
@@ -108,7 +112,7 @@ async def process_asr_request(
 
             for chunk_path in chunk_paths:
                 # Transcribe this chunk
-                results = transcriber_with_config.transcribe(
+                results = transcriber.transcribe(
                     audio_input=[chunk_path],
                     batch_size=batch_size,
                     pnc=pnc,
@@ -146,7 +150,7 @@ async def process_asr_request(
                 os.remove(chunk_path)
 
         else:
-            results = transcriber_with_config.transcribe(
+            results = transcriber.transcribe(
                 audio_input=[audio_path],
                 batch_size=batch_size,
                 pnc=pnc,
