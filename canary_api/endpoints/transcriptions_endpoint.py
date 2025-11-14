@@ -228,3 +228,42 @@ async def asr_endpoint(request: Request):
     except Exception as e:
         logger.error(f"Request failed: {str(e)}")
         raise HTTPException(500, "Internal server error")
+
+
+@router.post("/v1/audio/transcriptions")
+async def openai_transcriptions_endpoint(request: Request):
+    try:
+        form_data = await request.form()
+        input_file: UploadFile = form_data.get('file')
+        if not input_file:
+            logger.error("Missing audio file")
+            raise HTTPException(400, "Missing audio file")
+
+        audio_bytes = await input_file.read()
+        language = form_data.get('language', 'en')
+        response_format = form_data.get('response_format', 'json')
+        
+        result = await process_asr_request(
+            audio_bytes,
+            language,
+            pnc='yes',
+            timestamps='no',
+            beam_size=1,
+            batch_size=1,
+            response_format=response_format
+        )
+
+        if isinstance(result, str):
+            return Response(content=result, media_type="text/plain")
+        else:
+            return JSONResponse(content=result)
+
+    except HTTPException as he:
+        logger.error(f"Request failed: {str(he)}")
+        raise he
+    except ValidationError as ve:
+        logger.error(f"Validation error: {str(ve)}")
+        raise HTTPException(400, str(ve))
+    except Exception as e:
+        logger.error(f"Request failed: {str(e)}")
+        raise HTTPException(500, "Internal server error")

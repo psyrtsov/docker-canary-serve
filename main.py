@@ -9,6 +9,10 @@ app = FastAPI(
 
 app.include_router(asr_router)
 
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 if __name__ == "__main__":
     import uvicorn
 

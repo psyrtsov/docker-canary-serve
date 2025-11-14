@@ -1,0 +1,22 @@
+x-shared-logs: &shared-logs
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "10k"
+
+services:
+  api:
+    restart: "unless-stopped"
+    runtime: nvidia
+    build:
+      context: .
+    volumes:
+      - ./models:/app/models
+    environment:
+      CANARY_MODEL_PATH: /app/models
+      CANARY_MODEL_NAME: nvidia/canary-1b-v2
+      CANARY_BEAM_SIZE: 5
+      NVIDIA_VISIBLE_DEVICES: all
+    ports:
+      - "9000:9000"
+    <<: *shared-logs
