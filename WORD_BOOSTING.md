@@ -1,13 +1,19 @@
 # Word Boosting Guide
 
-Word boosting allows you to bias the ASR model to better recognize specific words or phrases without retraining. This is perfect for:
+**⚠️ Note: Word boosting is currently NOT YET IMPLEMENTED for Canary models.**
+
+This guide describes the planned feature. Word boosting support requires integration with NeMo's GPU-PB decoder configuration, which is not directly exposed through the Canary model's transcribe() API.
+
+---
+
+Word boosting would allow you to bias the ASR model to better recognize specific words or phrases without retraining. This would be perfect for:
 
 - Voice control commands
 - Industry-specific terminology
 - Product/brand names
 - Uncommon words
 
-## How It Works
+## How It Would Work
 
 Word boosting uses GPU-PB (GPU-accelerated Phrase Boosting) to increase the likelihood of specific words during decoding.
 

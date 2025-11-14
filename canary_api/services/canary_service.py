@@ -78,15 +78,22 @@ class CanaryService:
             "word_boosting": word_boosting
         })
 
-        return self.model.transcribe(
-            audio_input,
-            source_lang=source_lang,
-            target_lang=target_lang,
-            batch_size=batch_size,
-            pnc=pnc,
-            timestamps=timestamps,
-            word_boosting=word_boosting
-        )
+        transcribe_kwargs = {
+            "audio_input": audio_input,
+            "source_lang": source_lang,
+            "target_lang": target_lang,
+            "batch_size": batch_size,
+            "pnc": pnc,
+            "timestamps": timestamps
+        }
+        
+        # Word boosting is not directly supported by model.transcribe()
+        # It requires custom decoder configuration which is not yet implemented
+        # Keeping parameter for future compatibility
+        if word_boosting:
+            logger.warning("Word boosting parameter received but not yet implemented for Canary model")
+        
+        return self.model.transcribe(**transcribe_kwargs)
 
 
 if __name__ == "__main__":
