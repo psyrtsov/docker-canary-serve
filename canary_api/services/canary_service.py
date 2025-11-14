@@ -79,7 +79,7 @@ class CanaryService:
         })
 
         transcribe_kwargs = {
-            "audio_input": audio_input,
+            "audio": audio_input,
             "source_lang": source_lang,
             "target_lang": target_lang,
             "batch_size": batch_size,
